@@ -40,6 +40,8 @@ class ComponentsDescriptor:
 
     def __set__(self, obj: HyperE, value: Iterable[int | Hyperions]) -> None:
         obj._components = list(value)
+        obj.is_validated = False
+        obj.is_normalized = False
 
 
 @total_ordering
