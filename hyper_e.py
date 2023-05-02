@@ -6,6 +6,7 @@ from enum import Enum
 from functools import total_ordering
 from re import compile, I
 
+
 __all__ = ("Hyperions", "ProcessExtent", "HyperE")
 
 
@@ -32,18 +33,6 @@ class Hyperions:
             return NotImplemented
 
 
-class ComponentsDescriptor:
-    def __get__(
-        self, obj: HyperE, objtype: type[HyperE] | None = None
-    ) -> list[int | Hyperions]:
-        return obj._components
-
-    def __set__(self, obj: HyperE, value: Iterable[int | Hyperions]) -> None:
-        obj._components = list(value)
-        obj.is_validated = False
-        obj.is_normalized = False
-
-
 @total_ordering
 class ProcessExtent(Enum):
     CONSTRUCT = 0
@@ -55,6 +44,18 @@ class ProcessExtent(Enum):
             return self.value < other.value
         else:
             return NotImplemented
+
+
+class ComponentsDescriptor:
+    def __get__(
+        self, obj: HyperE, objtype: type[HyperE] | None = None
+    ) -> list[int | Hyperions]:
+        return obj._components
+
+    def __set__(self, obj: HyperE, value: Iterable[int | Hyperions]) -> None:
+        obj._components = list(value)
+        obj.is_validated = False
+        obj.is_normalized = False
 
 
 class HyperE:
