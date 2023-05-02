@@ -6,7 +6,7 @@ from enum import Enum
 from functools import total_ordering
 from re import compile, I
 
-__all__ = ("Hyperions", "ProcessExtent", "HyperE")
+__all__ = ("Hyperions", "ProcessExtent", "XHyperE")
 
 
 # Constants
@@ -34,11 +34,11 @@ class Hyperions:
 
 class ComponentsDescriptor:
     def __get__(
-        self, obj: HyperE, objtype: type[HyperE] | None = None
+        self, obj: XHyperE, objtype: type[XHyperE] | None = None
     ) -> list[int | Hyperions]:
         return obj._components
 
-    def __set__(self, obj: HyperE, value: Iterable[int | Hyperions]) -> None:
+    def __set__(self, obj: XHyperE, value: Iterable[int | Hyperions]) -> None:
         obj._components = list(value)
 
 
@@ -55,7 +55,7 @@ class ProcessExtent(Enum):
             return NotImplemented
 
 
-class HyperE:
+class XHyperE:
     _components: list[int | Hyperions]
     components = ComponentsDescriptor()
     base: int
@@ -97,7 +97,7 @@ class HyperE:
     @overload
     def __init__(
         self,
-        other: HyperE,
+        other: XHyperE,
         /,
         *,
         base: int | None = ...,
@@ -125,7 +125,7 @@ class HyperE:
 
                 base = parsed_base or base
                 self._init(components, base or DEFAULT_BASE, True)
-            case [HyperE() as other]:
+            case [XHyperE() as other]:
                 self.copy_from(other)
                 self.base = base or self.base
                 copied = True
@@ -157,7 +157,7 @@ class HyperE:
         self.is_validated = is_validated
         self.is_normalized = is_normalized
 
-    def copy_from(self, other: HyperE) -> None:
+    def copy_from(self, other: XHyperE) -> None:
         self._components = other._components
         self.base = other.base
         self.is_validated = other.is_validated
