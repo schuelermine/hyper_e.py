@@ -133,7 +133,8 @@ class HyperE:
                 copied = True
             case [[*components]] | [*components]:
                 self._init(
-                    cast(Iterable[int | Hyperions], components), base or DEFAULT_BASE
+                    cast(Iterable[int | Hyperions], components),
+                    base or DEFAULT_BASE
                     # This cast is ok because we later check the types
                 )
 
