@@ -175,7 +175,7 @@ class HyperE:
     def _parse(expression: str) -> tuple[int | None, list[int | Hyperions]]:
         e_prefix = E_PREFIX_R.match(expression)
         if e_prefix is None:
-            raise SyntaxError("expression does not start with E[<base>]")
+            raise SyntaxError("expression does not start with 'E' with optional base")
 
         base = e_prefix.group("base")
         if base is not None:
@@ -187,13 +187,18 @@ class HyperE:
         while len(expression) != 0:
             component = COMPONENT_R.match(expression)
             if component is None:
-                raise SyntaxError(f"found non-digit non-hyperion at index {ix}")
+                msg = f"found non-digit non-hyperion at index {ix}"
+                if ix == 0:
+                    msg += (
+                        "\nthis occurred near the start, maybe the base is malformed?"
+                    )
+                raise SyntaxError(msg)
 
             argument = component.group("argument")
             if argument is not None:
                 argument = int(argument)
                 if argument == 0:
-                    raise SyntaxError(f"found illegal zero argument at index {ix}")
+                    raise SyntaxError(f"found illegal zero int component at index {ix}")
 
                 components.append(argument)
             elif (hyperions := component.group("hyperions")) is not None:
@@ -204,7 +209,7 @@ class HyperE:
             expression = expression[end:]
 
         if len(components) == 0:
-            raise SyntaxError("at least one argument is required")
+            raise SyntaxError("at least one component is required")
 
         return base, components
 
@@ -212,7 +217,7 @@ class HyperE:
     def _type_check(component_type: type, ix: int) -> None:
         if not issubclass(component_type, (int, Hyperions)):
             raise TypeError(
-                f"component type must be int or Hyperions, found '{component_type.__name__}' at {ix}"
+                f"component type must be int or Hyperions, found '{component_type.__name__}' at index {ix}"
             )
 
     def validate(self) -> None:
@@ -227,13 +232,13 @@ class HyperE:
 
         components = self.components
         if len(components) == 0:
-            raise ValueError("component list cannot be empty")
+            raise ValueError("cannot have no components")
 
         head = components[0]
         component_type = type(head)
         self._type_check(component_type, 0)
         if isinstance(head, Hyperions):
-            raise ValueError("component list cannot start with hyperions")
+            raise ValueError("first component cannot be hyperions")
 
         nonpositive_check(head, 0)
         previous_type: type[int] | type[Hyperions] = int
@@ -243,7 +248,7 @@ class HyperE:
                 nonpositive_check(component, ix)
                 if issubclass(previous_type, int):
                     raise ValueError(
-                        f"component list cannot contain adjacent integer components, found two at index {ix - 1}"
+                        f"cannot have int component next to int component, found such components at index {ix - 1}"
                     )
 
             else:
@@ -253,7 +258,7 @@ class HyperE:
 
         self._type_check(previous_type, len(components))
         if issubclass(previous_type, Hyperions):
-            raise ValueError("component list cannot end with hyperions")
+            raise ValueError("cannot end with hyperions, last component must be int")
 
         self.is_validated = True
 
