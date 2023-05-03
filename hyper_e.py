@@ -53,10 +53,11 @@ class ComponentsDescriptor:
         return obj._components
 
     def __set__(self, obj: HyperE, value: Iterable[int | Hyperions]) -> None:
-        components = list(value)
-        for ix, component in enumerate(components):
+        def guard(component: int | Hyperions, ix: int) -> int | Hyperions:
             obj._type_check(type(component), ix)
-        obj._components = components
+            return component
+
+        obj._components = [guard(component, ix) for ix, component in enumerate(value)]
         obj.is_validated = False
         obj.is_normalized = False
 
@@ -192,7 +193,7 @@ class HyperE:
             if argument is not None:
                 argument = int(argument)
                 if argument == 0:
-                    raise ValueError(f"found zero argument at index {ix}")
+                    raise SyntaxError(f"found illegal zero argument at index {ix}")
 
                 components.append(argument)
             elif (hyperions := component.group("hyperions")) is not None:
@@ -201,6 +202,9 @@ class HyperE:
             end = component.end()
             ix += end
             expression = expression[end:]
+
+        if len(components) == 0:
+            raise SyntaxError("at least one argument is required")
 
         return base, components
 
