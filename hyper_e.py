@@ -49,11 +49,8 @@ class ProcessExtent(Enum):
 class ComponentsDescriptor:
     def __get__(
         self, obj: HyperE, objtype: type[HyperE] | None = None
-    ) -> list[int | Hyperions]:
-        if objtype is None and obj is not None:
-            objtype = type(obj)
-        
-        if objtype is None:
+    ) -> list[int | Hyperions]:        
+        if obj is None:
             raise AttributeError(
                 "instance attribute 'components' cannot be accessed like this"
             )
