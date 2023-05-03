@@ -50,6 +50,14 @@ class ComponentsDescriptor:
     def __get__(
         self, obj: HyperE, objtype: type[HyperE] | None = None
     ) -> list[int | Hyperions]:
+        if objtype is None and obj is not None:
+            objtype = type(obj)
+        
+        if objtype is None:
+            raise AttributeError(
+                "instance attribute 'components' cannot be accessed like this"
+            )
+        
         return obj._components
 
     def __set__(self, obj: HyperE, value: Iterable[int | Hyperions]) -> None:
