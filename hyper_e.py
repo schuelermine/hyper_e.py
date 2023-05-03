@@ -53,6 +53,11 @@ class ComponentsDescriptor:
         return obj._components
 
     def __set__(self, obj: HyperE, value: Iterable[int | Hyperions]) -> None:
+        if obj is None:
+            raise AttributeError(
+                "instance attribute 'components' cannot be accessed like this"
+            )
+
         def guard(component: int | Hyperions, ix: int) -> int | Hyperions:
             obj._type_check(type(component), ix)
             return component
