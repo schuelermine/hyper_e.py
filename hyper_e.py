@@ -53,7 +53,10 @@ class ComponentsDescriptor:
         return obj._components
 
     def __set__(self, obj: HyperE, value: Iterable[int | Hyperions]) -> None:
-        obj._components = list(value)
+        components = list(value)
+        for ix, component in enumerate(components):
+            obj._type_check(type(component), ix)
+        obj._components = components
         obj.is_validated = False
         obj.is_normalized = False
 
