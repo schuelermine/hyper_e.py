@@ -1,6 +1,6 @@
 from __future__ import annotations
 from dataclasses import dataclass
-from typing import cast, overload, NoReturn
+from typing import cast, overload
 from collections.abc import Iterable, Iterator
 from enum import Enum
 from functools import total_ordering
@@ -292,11 +292,11 @@ class HyperE:
 
     def evaluate(self) -> int:
         self.validate()
-        return self._evaluate(list(self.normalized()), self.base)
+        return self._evaluate(self.normalized(), self.base)
 
-    # warning: components must be normalized
+    # precondition: components must be normalized
     @classmethod
-    def _evaluate(cls, components: list[int | Hyperions], base: int) -> int:
+    def _evaluate(cls, components: Iterable[int | Hyperions], base: int) -> int:
         match components:
             case [argument]:
                 return cast(int, base ** cast(int, argument))
