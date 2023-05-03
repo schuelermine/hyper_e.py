@@ -274,7 +274,7 @@ class HyperE:
 
     def normalize(self) -> None:
         self.validate()
-        self.components = list(self.normalized())
+        self._components = list(self.normalized())
 
     def normalized(self) -> Iterator[int | Hyperions]:
         if not self.is_validated:
@@ -307,11 +307,11 @@ class HyperE:
 
     def evaluate(self) -> int:
         self.validate()
-        return self._evaluate(self.normalized(), self.base)
+        return self._evaluate(list(self.normalized()), self.base)
 
     # precondition: components must be normalized
     @classmethod
-    def _evaluate(cls, components: Iterable[int | Hyperions], base: int) -> int:
+    def _evaluate(cls, components: list[int | Hyperions], base: int) -> int:
         match components:
             case [argument]:
                 return cast(int, base ** cast(int, argument))
