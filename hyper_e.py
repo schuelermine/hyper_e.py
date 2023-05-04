@@ -82,16 +82,6 @@ class HyperE:
     @overload
     def __init__(
         self,
-        /,
-        *args: int | Hyperions,
-        base: int | None = ...,
-        process_extent: ProcessExtent = ...,
-    ):
-        ...
-
-    @overload
-    def __init__(
-        self,
         components: Iterable[int | Hyperions],
         /,
         *,
@@ -125,15 +115,16 @@ class HyperE:
     def __init__(
         self,
         /,
-        *args: object,
+        arg: Iterable[int | Hyperions] | str | HyperE,
         base: int | None = None,
         process_extent: ProcessExtent = ProcessExtent.NORMALIZE,
     ):
+        if base is not None and base < 1:
+            raise ValueError(f"base cannot be zero or lower, got {base}")
+
         copied = False
-        match args:
-            case []:
-                raise TypeError("__init__() missing required arguments")
-            case [str(expression)]:
+        match arg:
+            case str(expression):
                 parsed_base, components = self._parse(expression)
                 if parsed_base and base:
                     raise ValueError(
@@ -142,11 +133,11 @@ class HyperE:
 
                 base = parsed_base or base
                 self._init(components, base or DEFAULT_BASE, True)
-            case [HyperE() as other]:
+            case HyperE() as other:
                 self.copy_from(other)
                 self.base = base or self.base
                 copied = True
-            case [[*components]] | [*components]:
+            case components:
                 self._init(
                     cast(Iterable[int | Hyperions], components),
                     base or DEFAULT_BASE
